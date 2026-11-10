@@ -1,0 +1,5 @@
+*.xpi
+private/
+*.key
+*-private.pem
+signed/

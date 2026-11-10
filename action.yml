@@ -1,0 +1,42 @@
+name: Sign XPI
+description: Sign a Firefox XPI with a user-managed X.509 CA using Mozilla-compatible JAR/CMS signatures.
+branding:
+  icon: shield
+  color: green
+
+inputs:
+  source:
+    description: Path to the unsigned XPI file.
+    required: true
+  artifacts:
+    description: Directory for the signed XPI.
+    required: false
+    default: signed
+  privateKey:
+    description: CA private key (PEM text or local file path; typically a GitHub Actions secret).
+    required: true
+  certificate:
+    description: CA certificate (PEM text or local file path).
+    required: true
+  expectedId:
+    description: Expected Gecko add-on ID; reject a different ID.
+    required: false
+
+outputs:
+  target:
+    description: Absolute path to the signed XPI.
+    value: ${{ steps.sign.outputs.target }}
+
+runs:
+  using: composite
+  steps:
+    - id: sign
+      shell: bash
+      env:
+        XPI_SOURCE: ${{ inputs.source }}
+        XPI_ARTIFACTS: ${{ inputs.artifacts }}
+        XPI_PRIVATE_KEY: ${{ inputs.privateKey }}
+        XPI_CERTIFICATE: ${{ inputs.certificate }}
+        XPI_EXPECTED_ID: ${{ inputs.expectedId }}
+        XPI_ACTION_ROOT: ${{ github.action_path }}
+      run: bash "$XPI_ACTION_ROOT/scripts/run.sh"
